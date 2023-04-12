@@ -21,7 +21,7 @@ class _SignInPageState extends State<SignInPage> {
                 // end: Alignment.bottomCenter,
                 colors: [
                   Color(0xFF002B5B),
-                  Color(0xFF2F3131),
+                  Color(0xFF1A5F7A),
                 ])),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
