@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1072402616853",
+    "project_id": "fir-test-9b2bd",
+    "storage_bucket": "fir-test-9b2bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072402616853:android:2e1b155a014b7e8882b41c",
+        "android_client_info": {
+          "package_name": "com.example.moodin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQqANVeLTyzkwhQBZlkCHZawgGzhpO1r0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

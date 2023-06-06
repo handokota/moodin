@@ -19,8 +19,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 begin: Alignment.topCenter,
                 // end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF002B5B),
-                  Color(0xFF1A5F7A),
+                  Color(0xFF1DA1F2),
+                  Color(0xFF1DA1F2),
                 ])),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,10 +131,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           },
                           style: ElevatedButton.styleFrom(
                             // padding: EdgeInsets.all(20),
-                            backgroundColor: const Color.fromARGB(255, 0, 43, 91),
+                            backgroundColor: const Color.fromARGB(255, 29, 161, 242),
                             fixedSize: const Size(300, 50),
                             elevation: 15,
-                            shadowColor: const Color.fromARGB(255, 0, 43, 91),
+                            shadowColor: const Color.fromARGB(255, 29, 161, 242),
                             textStyle: const TextStyle(fontFamily: "Netflix",
                               fontWeight: FontWeight.w600,
                               fontSize: 18,
