@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodin/pages/signin_page.dart';
+import 'package:moodin/firebase_options.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -9,9 +10,26 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  late TextEditingController _controllerUsername;
+  late TextEditingController _controllerPhoneNumber;
+  late TextEditingController _controllerEmail;
+  late TextEditingController _controllerPassword;
+
+  @override
+  void initState(){
+    initFirebase();
+    _controllerUsername = TextEditingController();
+    _controllerPhoneNumber = TextEditingController();
+    _controllerEmail = TextEditingController();
+    _controllerPassword = TextEditingController();
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -19,8 +37,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 begin: Alignment.topCenter,
                 // end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF1DA1F2),
-                  Color(0xFF1DA1F2),
+                  Color(0xFF0694f0),
+                  Color(0xFF0694f0),
                 ])),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,8 +53,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 children: const <Widget>[
                   Center(
                     child: Text(
-                      "Sign Up",
-                      style: TextStyle(color: Colors.white, fontSize: 40),
+                      "Register",
+                      style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -62,56 +80,56 @@ class _SignUpPageState extends State<SignUpPage> {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: const [
-                                BoxShadow(
-                                    color: Color.fromRGBO(183, 183, 183, 1.0),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 15))
-                              ]),
+                            borderRadius: BorderRadius.circular(24),
+                            color: Colors.white,
+                            border: Border.all(color: const Color(0xFFdbdcdf), width: 1),
+                          ),
                           child: Column(
-                            children: const <Widget>[
+                            children: <Widget>[
                               TextField(
+                                controller: _controllerUsername,
                                 keyboardType: TextInputType.name,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.person),
+                                  prefixIcon: const Icon(Icons.person),
                                   labelText: 'Username',
                                   hintText: "Type username",
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               TextField(
+                                controller: _controllerPhoneNumber,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.call),
+                                  prefixIcon: const Icon(Icons.call),
                                   labelText: 'Phone Number',
                                   hintText: "Type phone number",
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               TextField(
                                 keyboardType: TextInputType.emailAddress,
+                                controller: _controllerEmail,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.email),
+                                  prefixIcon: const Icon(Icons.email),
                                   labelText: 'Email',
                                   hintText: "Type a new Email",
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               TextField(
                                 keyboardType: TextInputType.visiblePassword,
+                                controller: _controllerPassword,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.key),
+                                  prefixIcon: const Icon(Icons.key),
                                   labelText: 'Password',
                                   hintText: "Type a new Password",
                                   hintStyle: TextStyle(color: Colors.grey),
@@ -124,30 +142,38 @@ class _SignUpPageState extends State<SignUpPage> {
                           height: 30,
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          child: Text("Sign Up"),
+                          onPressed: ()async {
+                            final Map<String, dynamic> data = {
+                              'username' : _controllerUsername.text,
+                              'phoneNumber' : _controllerPhoneNumber.text,
+                              'password' : _controllerPassword.text,
+                              'email' : _controllerEmail.text
+                            };
+                            //untuk menambahkan data ke database
+                            await db.collection('users').add(data).then((value) => {});
+
                             Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return const SignInPage();
+                              return SignInPage();
                             }));
                           },
                           style: ElevatedButton.styleFrom(
-                            // padding: EdgeInsets.all(20),
-                            backgroundColor: const Color.fromARGB(255, 29, 161, 242),
-                            fixedSize: const Size(300, 50),
+                            // padding: EdgeInsets.all(20), backgroundColor: Color.fromARGB(255, 186, 71, 0),
+                            fixedSize: Size(300, 50),
                             elevation: 15,
-                            shadowColor: const Color.fromARGB(255, 29, 161, 242),
-                            textStyle: const TextStyle(fontFamily: "Netflix",
+                            // shadowColor: Color.fromARGB(255, 186, 71, 0),
+                            textStyle: TextStyle(fontFamily: "Netflix",
                               fontWeight: FontWeight.w600,
                               fontSize: 18,
                               letterSpacing: 0.0,
                               color: Colors.white,),
                           ),
-                          child: const Text("Sign Up"),
                         ),
-                        const SizedBox(height: 20,),
+                        SizedBox(height: 20,),
                         TextButton(
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return const SignInPage();
+                              return SignInPage();
                             }));
                           },
                           child: const Text("Already have account? Sign In", style: TextStyle(color: Colors.grey,),),

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-// import 'package:moodin/pages/statistic_page.dart';
+import 'package:moodin/pages/statistic_page.dart';
 import 'package:moodin/pages/calendar_page.dart';
 import 'package:moodin/pages/profile_page.dart';
 import 'package:moodin/pages/about_page.dart';
@@ -22,8 +22,8 @@ class _NavigationState extends State<Navigation> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    // MoodGrafik(),
     const CalendarPage(),
+    const StatisticPage(),
     const ProfilePage(),
     const AboutPage(),
   ];
@@ -58,6 +58,11 @@ class _NavigationState extends State<Navigation> {
               icon: Icon(Icons.event_note_outlined, size: 28, color: Colors.black),
               activeIcon: Icon(Icons.event_note, size: 28, color: Colors.black),
               label: 'Calendar',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.leaderboard_outlined, size: 28, color: Colors.black),
+              activeIcon: Icon(Icons.leaderboard, size: 28, color: Colors.black),
+              label: 'Statistic',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.account_circle_outlined, size: 28, color: Colors.black),

@@ -1,11 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Referensi Utama : https://www.youtube.com/watch?v=d4KFeRdZMcw
+//Referensi : https://stackoverflow.com/questions/62108798/how-to-save-page-state-on-revisit-in-flutter
+// Referensi : https://medium.com/unitechie/flutter-tutorial-image-picker-from-camera-gallery-c27af5490b74
+//Referensi : https://stackoverflow.com/questions/62128847/how-to-save-set-image-of-pickedfile-type-to-a-image-in-flutter
+//https://stackoverflow.com/questions/59558604/why-do-we-use-the-dispose-method-in-flutter-dart-code
+//referensi : https://protocoderspoint.com/flutter-profile-page-ui-design-social-media-2/
+//Referensi : https://stackoverflow.com/questions/71566069/edit-user-profile-page-and-profile-picture-using-real-time-database-flutter
+
+//Referensi : https://stackoverflow.com/questions/62108798/how-to-save-page-state-on-revisit-in-flutter
 
 class ProfilePage extends StatefulWidget {
-  //Referensi : https://stackoverflow.com/questions/62108798/how-to-save-page-state-on-revisit-in-flutter
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
@@ -18,50 +27,22 @@ class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _jobTitleController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
-  File? _profileImage; // deklarasi null
+  File? _profileImage;
   final picker = ImagePicker();
-  //var myFile = File('file.txt');
-
-
-  Future _pickImage() async {
-    // Referensi : https://medium.com/unitechie/flutter-tutorial-image-picker-from-camera-gallery-c27af5490b74
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  //Referensi : https://stackoverflow.com/questions/62128847/how-to-save-set-image-of-pickedfile-type-to-a-image-in-flutter
-  Widget _buildProfileImage() {
-    return GestureDetector(
-      onTap: () {
-        _pickImage();
-      },
-      child: CircleAvatar(
-        radius: 80.0,
-        backgroundColor: Colors.grey[200],
-        backgroundImage: _profileImage != null
-            ? FileImage(_profileImage!) as ImageProvider<Object>
-            : const AssetImage('assets/profile/profile_image.jpeg'),
-      ),
-    );
-  }
+  final CollectionReference _profileCollection =
+  FirebaseFirestore.instance.collection('profiles');
 
   @override
   void initState() {
-    //menginisialisasi tampilan awal
     super.initState();
     _nameController = TextEditingController(text: 'Anonymous');
     _jobTitleController = TextEditingController(text: 'Software Engineer');
     _emailController = TextEditingController(text: 'email@example.com');
     _phoneController = TextEditingController(text: '+62 823 4761567');
     _profileImage = null;
+    _loadProfilePicture();
   }
 
-  //https://stackoverflow.com/questions/59558604/why-do-we-use-the-dispose-method-in-flutter-dart-code
   @override
   void dispose() {
     _nameController.dispose();
@@ -71,16 +52,70 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  //referensi : https://protocoderspoint.com/flutter-profile-page-ui-design-social-media-2/
+  Future<void> _loadProfilePicture() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? imagePath = prefs.getString('profileImage');
+    if (imagePath != null) {
+      setState(() {
+        _profileImage = File(imagePath);
+      });
+    }
+  }
+
+  Future<void> _saveProfilePicture(String imagePath) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('profileImage', imagePath);
+  }
+
+  Future<void> _removeProfilePicture() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('profileImage');
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+        _saveProfilePicture(pickedFile.path);
+      });
+    }
+  }
+
+  Widget _buildProfileImage() {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: CircleAvatar(
+        radius: 80.0,
+        backgroundColor: Colors.grey[200],
+        backgroundImage: _profileImage != null
+            ? FileImage(_profileImage!) as ImageProvider<Object>
+            : AssetImage('assets/profile/profile_image.jpeg'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text('Profile',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => _editProfile(context),
+          IconTheme(
+            data: const IconThemeData(color: Colors.black),
+            child: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _editProfile(context),
+            ),
           ),
         ],
       ),
@@ -91,32 +126,32 @@ class _ProfilePageState extends State<ProfilePage> {
           children: <Widget>[
             _buildProfileImage(),
             const SizedBox(height: 20.0),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16.0),
             TextFormField(
               controller: _nameController,
               readOnly: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Name',
               ),
             ),
             TextFormField(
               controller: _jobTitleController,
               readOnly: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Job Title',
               ),
             ),
             TextFormField(
               controller: _emailController,
               readOnly: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Email',
               ),
             ),
             TextFormField(
               controller: _phoneController,
               readOnly: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Phone Number',
               ),
             ),
@@ -130,12 +165,14 @@ class _ProfilePageState extends State<ProfilePage> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (_) => EditProfilePage(
-            name: _nameController.text,
-            jobTitle: _jobTitleController.text,
-            email: _emailController.text,
-            phone: _phoneController.text,
-          )),
+        builder: (_) => EditProfilePage(
+          name: _nameController.text,
+          jobTitle: _jobTitleController.text,
+          email: _emailController.text,
+          phone: _phoneController.text,
+          profileCollection: _profileCollection,
+        ),
+      ),
     );
     if (result != null && result is Map<String, String>) {
       setState(() {
@@ -144,29 +181,31 @@ class _ProfilePageState extends State<ProfilePage> {
         _emailController.text = result['email']!;
         _phoneController.text = result['phone']!;
 
-        const snackBar = SnackBar(content: Text('Profile updated!'));
+        final snackBar = SnackBar(content: Text('Profile updated!'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     }
   }
 }
 
-//Referensi : https://stackoverflow.com/questions/71566069/edit-user-profile-page-and-profile-picture-using-real-time-database-flutter
 class EditProfilePage extends StatefulWidget {
   final String name;
   final String jobTitle;
   final String email;
   final String phone;
+  final CollectionReference profileCollection;
 
-  const EditProfilePage(
-      {super.key,
-        required this.name,
-        required this.jobTitle,
-        required this.email,
-        required this.phone});
+  const EditProfilePage({
+    Key? key,
+    required this.name,
+    required this.jobTitle,
+    required this.email,
+    required this.phone,
+    required this.profileCollection,
+  }) : super(key: key);
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  _EditProfilePageState createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
@@ -198,22 +237,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text('Edit Profile'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
+            icon: Icon(Icons.check),
             onPressed: () => _saveProfile(context),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: _nameController,
                 validator: (value) {
@@ -222,7 +261,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Name',
                 ),
               ),
@@ -234,7 +273,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Job Title',
                 ),
               ),
@@ -246,7 +285,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Email',
                 ),
               ),
@@ -258,7 +297,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                   return null;
                 },
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Phone Number',
                 ),
               ),
@@ -269,7 +308,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  void _saveProfile(BuildContext context) {
+  void _saveProfile(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       final result = {
         'name': _nameController.text,
@@ -277,7 +316,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'email': _emailController.text,
         'phone': _phoneController.text,
       };
-      Navigator.pop(context, result);
+
+      try {
+        await widget.profileCollection.add(result);
+        Navigator.pop(context, result);
+      } catch (e) {
+        print('Error saving profile: $e');
+        final snackBar = SnackBar(content: Text('Failed to save profile'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     }
   }
 }

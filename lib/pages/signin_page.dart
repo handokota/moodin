@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moodin/pages/home_page.dart';
 import 'package:moodin/pages/signup_page.dart';
+import 'package:moodin/firebase_options.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -10,6 +11,17 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  late TextEditingController _controllerEmail;
+  late TextEditingController _controllerPassword;
+
+  @override
+  void initState(){
+    initFirebase();
+    _controllerEmail = TextEditingController();
+    _controllerPassword = TextEditingController();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,9 +32,11 @@ class _SignInPageState extends State<SignInPage> {
                 begin: Alignment.topCenter,
                 // end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFF1DA1F2),
-                  Color(0xFF1DA1F2),
-                ])),
+                  Color(0xFF0694f0),
+                  Color(0xFF0694f0),
+                ]
+            )
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -36,17 +50,10 @@ class _SignInPageState extends State<SignInPage> {
                 children: const <Widget>[
                   Center(
                     child: Text(
-                      "Login",
-                      style: TextStyle(color: Colors.white, fontSize: 40),
+                      "Welcome",
+                      style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  // Text(
-                  //   "Hallo Guys!",
-                  //   style: TextStyle(
-                  //       color: Colors.white,
-                  //       fontSize: 20,
-                  //       fontWeight: FontWeight.w100),
-                  // )
                 ],
               ),
             ),
@@ -59,7 +66,9 @@ class _SignInPageState extends State<SignInPage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(60),
-                          topRight: Radius.circular(60))),
+                          topRight: Radius.circular(60)
+                      )
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(30),
                     child: Column(
@@ -70,32 +79,30 @@ class _SignInPageState extends State<SignInPage> {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: const [
-                                BoxShadow(
-                                    color: Color.fromRGBO(183, 183, 183, 1.0),
-                                    blurRadius: 10,
-                                    offset: Offset(0, 15))
-                              ]),
+                            borderRadius: BorderRadius.circular(24),
+                            color: Colors.white,
+                            border: Border.all(color: const Color(0xFFdbdcdf), width: 1),
+                          ),
                           child: Column(
-                            children: const <Widget>[
+                            children: <Widget>[
                               TextField(
+                                controller: _controllerEmail,
                                 keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.email),
+                                  prefixIcon: const Icon(Icons.email),
                                   labelText: 'Email',
                                   hintText: "Type Email",
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               TextField(
+                                controller: _controllerPassword,
                                 keyboardType: TextInputType.visiblePassword,
                                 decoration: InputDecoration(
-                                  prefixIcon: Icon(Icons.key),
+                                  prefixIcon: const Icon(Icons.key),
                                   hintText: "Type Password",
                                   hintStyle: TextStyle(color: Colors.grey),
                                   labelText: 'Password',
@@ -108,33 +115,33 @@ class _SignInPageState extends State<SignInPage> {
                           height: 30,
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return Navigation();
-                            }));
+                          child: Text("Login"),
+                          onPressed: () async{
+                            await db.collection('users').where('email', isEqualTo: _controllerEmail.text).where('password', isEqualTo: _controllerPassword.text).get().then((value) {
+                              Navigator.push(context, MaterialPageRoute(builder: (context){
+                                return Navigation();
+                              }));
+                            } );
                           },
                           style: ElevatedButton.styleFrom(
-                            // padding: EdgeInsets.all(20),
-                            backgroundColor: const Color.fromARGB(
-                                255, 29, 161, 242),
-                            fixedSize: const Size(300, 50),
+                            // padding: EdgeInsets.all(20), backgroundColor: Color.fromARGB(255, 186, 71, 0),
+                            fixedSize: Size(300, 50),
                             elevation: 15,
-                            shadowColor: const Color.fromARGB(255, 29, 161, 242),
-                            textStyle: const TextStyle(fontFamily: "Netflix",
+                            // shadowColor: Color.fromARGB(255, 29, 161, 242),
+                            textStyle: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 18,
                               letterSpacing: 0.0,
                               color: Colors.white,),
                           ),
-                          child: const Text("Sign In"),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           height: 20,
                         ),
                         TextButton(
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return const SignUpPage();
+                              return SignUpPage();
                             }));
                           },
                           child: const Text(

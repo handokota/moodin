@@ -29,7 +29,14 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About'),
+        title: const Text('About',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.white,
       ),
       body: Center(
         child: Column(
