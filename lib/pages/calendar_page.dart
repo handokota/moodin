@@ -218,7 +218,7 @@ class _CalendarPageState extends State<CalendarPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddEventDialog(),
         label: const Icon(Icons.add),
-        backgroundColor: const Color(0xFF0694f0),
+        backgroundColor: const Color(0xFF000000),
       ),
     );
   }
@@ -388,7 +388,7 @@ class MoodOptionWidget extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isSelected ? Colors.blue : Colors.grey,
+                color: isSelected ? Colors.black : Colors.grey,
                 width: 2.0,
               ),
               borderRadius: BorderRadius.circular(8),
@@ -418,7 +418,7 @@ class MoodOptionWidget extends StatelessWidget {
 }
 
 class AppColors {
-  static const primaryColor = Color(0xFF0694F0);
+  static const primaryColor = Color(0xFF000000);
 }
 
 

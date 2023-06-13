@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 16),
                   const Row(
                     children: [
-                      Icon(Icons.edit_note, color: Color(0xFF0694F0)),
+                      Icon(Icons.edit_note, color: Color(0xFF000000)),
                       SizedBox(width: 8),
                       Text(
                         'Note',
@@ -279,7 +279,7 @@ class _HomePageState extends State<HomePage> {
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32),
-                        ), backgroundColor: const Color(0xFF0694f0), // Set the background color to EDECF0
+                        ), backgroundColor: const Color(0xFF000000), // Set the background color to EDECF0
                         elevation: 0, // Remove the button shadow
                       ),
                       child: const Text(
@@ -298,7 +298,7 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.only(top: 30, left: 16, right: 16),
               child: Row(
                 children: [
-                  Icon(Icons.location_on, color: Color(0xFF0694F0)),
+                  Icon(Icons.location_on, color: Color(0xFF000000)),
                   SizedBox(width: 8),
                   Text(
                     'Location',
@@ -334,7 +334,7 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.only(top: 30, left: 16, right: 16),
               child: Row(
                 children: [
-                  Icon(Icons.recommend, color: Color(0xFF0694F0)),
+                  Icon(Icons.recommend, color: Color(0xFF000000)),
                   SizedBox(width: 8),
                   Text(
                     'For you',
@@ -400,7 +400,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 16),
                       const Row(
                         children: [
-                          Icon(Icons.edit_note, color: Color(0xFF0694F0)),
+                          Icon(Icons.edit_note, color: Color(0xFF000000)),
                           SizedBox(width: 8),
                           Text(
                             'Note',
@@ -440,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: ListTile(
-                              leading: const Icon(Icons.event_note, color: Color(0xFF0694F0)),
+                              leading: const Icon(Icons.event_note, color: Color(0xFF000000)),
                               title: Text(
                                 DateFormat.yMMMMd().format(DateTime.now()),
                               ),
@@ -456,7 +456,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Expanded(
                             child: ListTile(
-                              leading: const Icon(Icons.access_time, color: Color(0xFF0694F0)),
+                              leading: const Icon(Icons.access_time, color: Color(0xFF000000)),
                               title: Text(
                                 TimeOfDay.now().format(context),
                               ),
@@ -534,7 +534,7 @@ class _HomePageState extends State<HomePage> {
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
-                            ), backgroundColor: const Color(0xFF0694f0), // Set the background color to EDECF0
+                            ), backgroundColor: const Color(0xFF000000), // Set the background color to EDECF0
                             elevation: 0, // Remove the button shadow
                           ),
                           child: const Text(
@@ -556,7 +556,7 @@ class _HomePageState extends State<HomePage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32),
         ),
-        backgroundColor: const Color(0xFF0694f0),
+        backgroundColor: const Color(0xFF000000),
         child: const Icon(Icons.add),
       ),
 
@@ -628,13 +628,13 @@ class MoodOptionModal extends StatelessWidget {
             'assets/images/$image',
             width: 48,
             height: 48,
-            color: isSelectedModal ? Colors.blue : null,
+            color: isSelectedModal ? Colors.black : null,
           ),
           const SizedBox(height: 8),
           Text(
             text,
             style: TextStyle(
-              color: isSelectedModal ? Colors.blue : null,
+              color: isSelectedModal ? Colors.black : null,
             ),
           ),
         ],

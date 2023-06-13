@@ -83,7 +83,7 @@ class _StatisticPage extends State<StatisticPage> {
                   ),
                   elevation: 0,
                   backgroundColor: Colors.white,
-                  bottom: TabBar(isScrollable: true, tabs: tabBulan, labelColor: Colors.black,)),
+                  bottom: TabBar(isScrollable: true, tabs: tabBulan, labelColor: Colors.black, indicatorColor: Colors.black,)),
               body: TabBarView(children: [
                 //JANUARI
                 ListView(
@@ -97,7 +97,7 @@ class _StatisticPage extends State<StatisticPage> {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          color: Colors.blue,
+                          color: Colors.black,
                           boxShadow: const [
                             BoxShadow(
                                 color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -223,7 +223,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -332,7 +332,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -440,7 +440,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -548,7 +548,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -656,7 +656,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -683,7 +683,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
@@ -710,7 +710,7 @@ class _StatisticPage extends State<StatisticPage> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        color: Colors.blue,
+                        color: Colors.black,
                         boxShadow: const [
                           BoxShadow(
                               color: Color.fromRGBO(72, 69, 68, 0.294),
