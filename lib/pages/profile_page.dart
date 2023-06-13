@@ -3,24 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-// Referensi Utama : https://www.youtube.com/watch?v=d4KFeRdZMcw
-//Referensi : https://stackoverflow.com/questions/62108798/how-to-save-page-state-on-revisit-in-flutter
-// Referensi : https://medium.com/unitechie/flutter-tutorial-image-picker-from-camera-gallery-c27af5490b74
-//Referensi : https://stackoverflow.com/questions/62128847/how-to-save-set-image-of-pickedfile-type-to-a-image-in-flutter
-//https://stackoverflow.com/questions/59558604/why-do-we-use-the-dispose-method-in-flutter-dart-code
-//referensi : https://protocoderspoint.com/flutter-profile-page-ui-design-social-media-2/
-//Referensi : https://stackoverflow.com/questions/71566069/edit-user-profile-page-and-profile-picture-using-real-time-database-flutter
-
-//Referensi : https://stackoverflow.com/questions/62108798/how-to-save-page-state-on-revisit-in-flutter
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  _ProfilePageState createState() => _ProfilePageState();
 }
-
 
 class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _nameController;
@@ -31,6 +22,24 @@ class _ProfilePageState extends State<ProfilePage> {
   final picker = ImagePicker();
   final CollectionReference _profileCollection =
   FirebaseFirestore.instance.collection('profiles');
+  late Database _database;
+
+  Future<void> _loadProfileData() async {
+    final documentSnapshot = await FirebaseFirestore.instance
+        .collection('profiles')
+        .doc('profile')
+        .get();
+
+    if (documentSnapshot.exists) {
+      final profile = documentSnapshot.data();
+      setState(() {
+        _nameController.text = profile?['name'] ?? '';
+        _jobTitleController.text = profile?['jobTitle'] ?? '';
+        _emailController.text = profile?['email'] ?? '';
+        _phoneController.text = profile?['phone'] ?? '';
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -40,7 +49,9 @@ class _ProfilePageState extends State<ProfilePage> {
     _emailController = TextEditingController(text: 'email@example.com');
     _phoneController = TextEditingController(text: '+62 823 4761567');
     _profileImage = null;
+    _initDatabase();
     _loadProfilePicture();
+    _loadProfileData();
   }
 
   @override
@@ -49,7 +60,25 @@ class _ProfilePageState extends State<ProfilePage> {
     _jobTitleController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _database.close();
     super.dispose();
+  }
+
+  Future<void> _initDatabase() async {
+    final databasesPath = await getDatabasesPath();
+    final path = join(databasesPath, 'profile_database.db');
+
+    _database = await openDatabase(path, version: 1,
+        onCreate: (Database db, int version) async {
+          await db.execute('CREATE TABLE IF NOT EXISTS profile ('
+              'id INTEGER PRIMARY KEY,'
+              'name TEXT,'
+              'jobTitle TEXT,'
+              'email TEXT,'
+              'phone TEXT,'
+              'profileImage TEXT'
+              ')');
+        });
   }
 
   Future<void> _loadProfilePicture() async {
@@ -110,12 +139,9 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-          IconTheme(
-            data: const IconThemeData(color: Colors.black),
-            child: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => _editProfile(context),
-            ),
+          IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () => _editProfile(context),
           ),
         ],
       ),
@@ -171,6 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
           email: _emailController.text,
           phone: _phoneController.text,
           profileCollection: _profileCollection,
+          database: _database,
         ),
       ),
     );
@@ -194,6 +221,7 @@ class EditProfilePage extends StatefulWidget {
   final String email;
   final String phone;
   final CollectionReference profileCollection;
+  final Database database;
 
   const EditProfilePage({
     Key? key,
@@ -202,6 +230,7 @@ class EditProfilePage extends StatefulWidget {
     required this.email,
     required this.phone,
     required this.profileCollection,
+    required this.database,
   }) : super(key: key);
 
   @override
@@ -215,6 +244,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
 
+  Future<void> _loadProfileData() async {
+    final databasesPath = await getDatabasesPath();
+    final path = join(databasesPath, 'profile_database.db');
+    final database = await openDatabase(path, version: 1);
+
+    final List<Map<String, dynamic>> result =
+    await database.rawQuery('SELECT * FROM profile');
+
+    if (result.isNotEmpty) {
+      final profile = result.first;
+      setState(() {
+        _nameController.text = profile['name'];
+        _jobTitleController.text = profile['jobTitle'];
+        _emailController.text = profile['email'];
+        _phoneController.text = profile['phone'];
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -222,6 +270,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _jobTitleController = TextEditingController(text: widget.jobTitle);
     _emailController = TextEditingController(text: widget.email);
     _phoneController = TextEditingController(text: widget.phone);
+    _loadProfileData();
   }
 
   @override
@@ -241,7 +290,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.check),
-            onPressed: () => _saveProfile(context),
+            onPressed: () => _updateProfile(context),
           ),
         ],
       ),
@@ -255,52 +304,60 @@ class _EditProfilePageState extends State<EditProfilePage> {
               SizedBox(height: 16.0),
               TextFormField(
                 controller: _nameController,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a name';
-                  }
-                  return null;
-                },
                 decoration: InputDecoration(
                   labelText: 'Name',
+                  border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
               ),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: _jobTitleController,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a job title';
-                  }
-                  return null;
-                },
                 decoration: InputDecoration(
                   labelText: 'Job Title',
+                  border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your job title';
+                  }
+                  return null;
+                },
               ),
+              SizedBox(height: 16.0),
               TextFormField(
                 controller: _emailController,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter an email';
-                  }
-                  return null;
-                },
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  border: OutlineInputBorder(),
                 ),
-              ),
-              TextFormField(
-                controller: _phoneController,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a phone number';
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
                   }
                   return null;
                 },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: _phoneController,
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
+                  border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your phone number';
+                  }
+                  return null;
+                },
               ),
+              SizedBox(height: 16.0),
             ],
           ),
         ),
@@ -308,23 +365,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  void _saveProfile(BuildContext context) async {
+  void _updateProfile(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      final result = {
-        'name': _nameController.text,
-        'jobTitle': _jobTitleController.text,
-        'email': _emailController.text,
-        'phone': _phoneController.text,
-      };
+      final name = _nameController.text;
+      final jobTitle = _jobTitleController.text;
+      final email = _emailController.text;
+      final phone = _phoneController.text;
 
-      try {
-        await widget.profileCollection.add(result);
-        Navigator.pop(context, result);
-      } catch (e) {
-        print('Error saving profile: $e');
-        final snackBar = SnackBar(content: Text('Failed to save profile'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }
+      widget.profileCollection.doc('profile').update({
+        'name': name,
+        'jobTitle': jobTitle,
+        'email': email,
+        'phone': phone,
+      });
+
+      widget.database.transaction((txn) async {
+        await txn.rawUpdate(
+          'UPDATE profile SET name=?, jobTitle=?, email=?, phone=? WHERE id=?',
+          [name, jobTitle, email, phone, 1],
+        );
+      });
+
+      Navigator.pop(
+        context,
+        {
+          'name': name,
+          'jobTitle': jobTitle,
+          'email': email,
+          'phone': phone,
+        },
+      );
     }
   }
 }

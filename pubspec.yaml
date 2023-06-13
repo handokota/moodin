@@ -47,6 +47,9 @@ dependencies:
   firebase_auth: ^4.6.2
   shared_preferences: ^2.1.1
   d_chart: ^2.2.11
+  sqflite: ^2.2.8+4
+  path_provider: ^2.0.15
+  path: ^1.8.3
 
 
 dev_dependencies:
